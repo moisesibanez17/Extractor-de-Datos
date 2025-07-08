@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Extractor de Metadatos</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background: #f9f9f9; }
+        form { margin-bottom: 20px; }
+        input[type="text"] { width: 60%; padding: 10px; font-size: 1em; }
+        button { padding: 10px 20px; font-size: 1em; }
+        .error { color: red; margin-top: 10px; }
+        .metadata { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px #ccc; }
+        dt { font-weight: bold; margin-top: 10px; }
+        dd { margin-left: 20px; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Extractor de Metadatos del Repositorio UC</h1>
+    <form method="post">
+        <input type="text" name="url" placeholder="Ingresa la URL del repositorio..." required>
+        <button type="submit">Extraer</button>
+    </form>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if metadatos %}
+        <div class="metadata">
+            <h2>📄 Metadatos Extraídos</h2>
+            <dl>
+                {% for key, valores in metadatos.items() %}
+                    <dt>{{ key }}</dt>
+                    {% for valor in valores %}
+                        <dd>{{ valor }}</dd>
+                    {% endfor %}
+                {% endfor %}
+            </dl>
+        </div>
+    {% endif %}
+</body>
+</html>
