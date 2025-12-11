@@ -54,16 +54,37 @@ TRADUCCIONES = {
 # ---------------------------
 #  BÚSQUEDA DE ITEMS
 # ---------------------------
-def buscar_items(query):
+def buscar_items(query, modo='colecciones'):
     all_results = []
     size = 20
     page = 0
+    
+    # Construir query según el modo de búsqueda
+    if modo == 'titulo':
+        search_query = f'dc.title:"{query}"'
+    elif modo == 'autor':
+        search_query = f'dc.contributor.author:"{query}"'
+    elif modo == 'fecha':
+        search_query = f'dc.date.issued:{query}'
+    elif modo == 'materias':
+        search_query = f'dc.subject:"{query}"'
+    elif modo == 'tipo':
+        search_query = f'dc.type:"{query}"'
+    elif modo == 'ods':
+        search_query = f'dc.subject.ods:"{query}"'
+    else:  # colecciones o búsqueda general
+        search_query = query
 
     while True:
-        url = f"{BASE_URL}/server/api/discover/search/objects?query={query}&page={page}&size={size}"
-        res = requests.get(url)
-        res.raise_for_status()
-        data = res.json()
+        url = f"{BASE_URL}/server/api/discover/search/objects?query={search_query}&page={page}&size={size}"
+        
+        try:
+            res = requests.get(url, timeout=10)
+            res.raise_for_status()
+            data = res.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error en la búsqueda: {e}")
+            break
 
         try:
             items = data["_embedded"]["searchResult"]["_embedded"]["objects"]
@@ -116,7 +137,8 @@ def index():
     resultados = []
     if request.method == 'POST':
         query = request.form['query']
-        resultados = buscar_items(query)
+        modo = request.form.get('modo', 'colecciones')
+        resultados = buscar_items(query, modo)
 
     return render_template('index.html', resultados=resultados)
 

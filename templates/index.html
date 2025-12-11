@@ -80,7 +80,7 @@
                 btn.classList.remove('active');
             }
         }
-        
+
         function cambiarModo(modo) {
             // Actualizar botones activos
             document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
@@ -91,12 +91,13 @@
             
             // Actualizar placeholder
             const placeholders = {
-                'general': 'Buscar en todos los campos...',
+                'colecciones': 'Buscar en colecciones...',
                 'titulo': 'Buscar por título del documento...',
                 'autor': 'Buscar por nombre del autor...',
                 'fecha': 'Buscar por año (ej: 2020, 2021-2023)...',
-                'materia': 'Buscar por materia o tema...',
-                'tipo': 'Buscar por tipo de documento...'
+                'materias': 'Buscar por materia o tema...',
+                'tipo': 'Buscar por tipo de material...',
+                'ods': 'Buscar por Objetivo de Desarrollo Sostenible...'
             };
             
             document.getElementById('searchInput').placeholder = placeholders[modo] || 'Buscar...';
@@ -122,36 +123,41 @@
             <h1>Extractor de Documentos<br><span style="font-size: 0.6em; color: #666;">Universidad Católica de Colombia</span></h1>
         </div>
 
+        <!-- Menú de navegación -->
         <div class="navigation-menu">
-            <button type="button" class="nav-item active" onclick="cambiarModo('general')" id="btn-general">
+            <button type="button" class="nav-item active" onclick="cambiarModo('colecciones')" id="btn-colecciones">
                 <div class="nav-icon">📚</div>
-                <span>Búsqueda<br>General</span>
+                <span>Navegar por<br>colecciones</span>
             </button>
             <button type="button" class="nav-item" onclick="cambiarModo('titulo')" id="btn-titulo">
                 <div class="nav-icon">🔍</div>
-                <span>Navegar por<br>Título</span>
+                <span>Navegar por<br>título</span>
             </button>
             <button type="button" class="nav-item" onclick="cambiarModo('autor')" id="btn-autor">
                 <div class="nav-icon">👤</div>
-                <span>Navegar por<br>Autor</span>
+                <span>Navegar por<br>autor</span>
             </button>
             <button type="button" class="nav-item" onclick="cambiarModo('fecha')" id="btn-fecha">
                 <div class="nav-icon">📅</div>
-                <span>Navegar por<br>Fecha</span>
+                <span>Navegar por<br>fecha</span>
             </button>
-            <button type="button" class="nav-item" onclick="cambiarModo('materia')" id="btn-materia">
+            <button type="button" class="nav-item" onclick="cambiarModo('materias')" id="btn-materias">
                 <div class="nav-icon">📖</div>
-                <span>Navegar por<br>Materia</span>
+                <span>Navegar por<br>materias</span>
             </button>
             <button type="button" class="nav-item" onclick="cambiarModo('tipo')" id="btn-tipo">
-                <div class="nav-icon">⚙️</div>
-                <span>Navegar por<br>Tipo</span>
+                <div class="nav-icon">📄</div>
+                <span>Navegar por tipo<br>de material</span>
+            </button>
+            <button type="button" class="nav-item" onclick="cambiarModo('ods')" id="btn-ods">
+                <div class="nav-icon">🌍</div>
+                <span>Navegar por<br>ODS</span>
             </button>
         </div>
 
         <form method="POST" class="search-form" onsubmit="mostrarBusqueda()">
-            <input type="hidden" name="modo" id="modoInput" value="general">
-            <input type="text" name="query" id="searchInput" placeholder="Buscar en todos los campos..." required>
+            <input type="hidden" name="modo" id="modoInput" value="colecciones">
+            <input type="text" name="query" id="searchInput" placeholder="Buscar en colecciones..." required>
             <button type="submit">Buscar</button>
         </form>
 
