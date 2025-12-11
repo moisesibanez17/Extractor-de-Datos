@@ -20,7 +20,7 @@ Aplicación web para buscar y extraer metadatos de documentos del repositorio in
 
 1. Clona el repositorio:
 ```bash
-git clone https://github.com/moisesibanez17/app.git
+git clone https://github.com/moisesibanez17/Extractor-de-Datos.git
 cd app
 ```
 
