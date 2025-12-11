@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Extractor de Datos - Universidad Católica de Colombia</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script>
+        function validarSeleccion(event) {
+            const checkboxes = document.querySelectorAll('input[name="seleccionados"]:checked');
+            if (checkboxes.length === 0) {
+                alert('Por favor, selecciona al menos un documento.');
+                return false;
+            }
+            
+            // Solo mostrar indicador si NO es exportación
+            const isExport = event.submitter && (
+                event.submitter.formAction.includes('/exportar/json') || 
+                event.submitter.formAction.includes('/exportar/excel')
+            );
+            
+            if (!isExport) {
+                mostrarCarga(checkboxes.length);
+            }
+            
+            return true;
+        }
+        
+        function mostrarCarga(total) {
+            const overlay = document.getElementById('loadingOverlay');
+            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');
+            
+            overlay.classList.add('active');
+            
+            // Simular progreso basado en cantidad de documentos
+            let current = 0;
+            const interval = setInterval(() => {
+                current++;
+                const percentage = Math.min((current / total) * 100, 95);
+                progressFill.style.width = percentage + '%';
+                progressText.textContent = `Procesando ${current} de ${total} documentos...`;
+                
+                if (current >= total) {
+                    clearInterval(interval);
+                    progressText.textContent = 'Finalizando...';
+                }
+            }, 500);
+        }
+        
+        function mostrarBusqueda() {
+            const overlay = document.getElementById('loadingOverlay');
+            const progressText = document.getElementById('progressText');
+            const progressFill = document.getElementById('progressFill');
+            
+            overlay.classList.add('active');
+            progressText.textContent = 'Buscando documentos...';
+            
+            // Barra de progreso indeterminada
+            let width = 0;
+            const interval = setInterval(() => {
+                width = (width + 10) % 100;
+                progressFill.style.width = width + '%';
+            }, 200);
+        }
+        
+        function toggleSeleccionarTodos() {
+            const checkboxes = document.querySelectorAll('input[name="seleccionados"]');
+            const btn = document.getElementById('btnSelectAll');
+            const todosMarcados = Array.from(checkboxes).every(cb => cb.checked);
+            
+            checkboxes.forEach(cb => {
+                cb.checked = !todosMarcados;
+            });
+            
+            if (!todosMarcados) {
+                btn.textContent = '✗ Deseleccionar Todos';
+                btn.classList.add('active');
+            } else {
+                btn.textContent = '✓ Seleccionar Todos';
+                btn.classList.remove('active');
+            }
+        }
+        
+        function cambiarModo(modo) {
+            // Actualizar botones activos
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + modo).classList.add('active');
+            
+            // Actualizar campo hidden
+            document.getElementById('modoInput').value = modo;
+            
+            // Actualizar placeholder
+            const placeholders = {
+                'general': 'Buscar en todos los campos...',
+                'titulo': 'Buscar por título del documento...',
+                'autor': 'Buscar por nombre del autor...',
+                'fecha': 'Buscar por año (ej: 2020, 2021-2023)...',
+                'materia': 'Buscar por materia o tema...',
+                'tipo': 'Buscar por tipo de documento...'
+            };
+            
+            document.getElementById('searchInput').placeholder = placeholders[modo] || 'Buscar...';
+        }
+    </script>
+</head>
+<body>
+    <!-- Overlay de carga -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h2>Procesando...</h2>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <p id="progressText" class="progress-text">Iniciando...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header-container">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Universidad Católica de Colombia" class="logo">
+            <h1>Extractor de Documentos<br><span style="font-size: 0.6em; color: #666;">Universidad Católica de Colombia</span></h1>
+        </div>
+
+        <div class="navigation-menu">
+            <button type="button" class="nav-item active" onclick="cambiarModo('general')" id="btn-general">
+                <div class="nav-icon">📚</div>
+                <span>Búsqueda<br>General</span>
+            </button>
+            <button type="button" class="nav-item" onclick="cambiarModo('titulo')" id="btn-titulo">
+                <div class="nav-icon">🔍</div>
+                <span>Navegar por<br>Título</span>
+            </button>
+            <button type="button" class="nav-item" onclick="cambiarModo('autor')" id="btn-autor">
+                <div class="nav-icon">👤</div>
+                <span>Navegar por<br>Autor</span>
+            </button>
+            <button type="button" class="nav-item" onclick="cambiarModo('fecha')" id="btn-fecha">
+                <div class="nav-icon">📅</div>
+                <span>Navegar por<br>Fecha</span>
+            </button>
+            <button type="button" class="nav-item" onclick="cambiarModo('materia')" id="btn-materia">
+                <div class="nav-icon">📖</div>
+                <span>Navegar por<br>Materia</span>
+            </button>
+            <button type="button" class="nav-item" onclick="cambiarModo('tipo')" id="btn-tipo">
+                <div class="nav-icon">⚙️</div>
+                <span>Navegar por<br>Tipo</span>
+            </button>
+        </div>
+
+        <form method="POST" class="search-form" onsubmit="mostrarBusqueda()">
+            <input type="hidden" name="modo" id="modoInput" value="general">
+            <input type="text" name="query" id="searchInput" placeholder="Buscar en todos los campos..." required>
+            <button type="submit">Buscar</button>
+        </form>
+
+        {% if resultados %}
+        <div style="margin-bottom: 1em; display: flex; justify-content: space-between; align-items: center;">
+            <p style="color: #666; font-size: 0.95em;">📊 Se encontraron <strong>{{ resultados|length }}</strong> resultados</p>
+            <button type="button" onclick="toggleSeleccionarTodos()" class="select-all-btn" id="btnSelectAll">
+                ✓ Seleccionar Todos
+            </button>
+        </div>
+        <form action="/extraer" method="POST" id="formExtraer" onsubmit="return validarSeleccion(event)">
+            <table>
+            <thead>
+                <tr>
+                    <th>✓</th>
+                    <th>Título</th>
+                    <th>Detalles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in resultados %}
+                <tr>
+                    <td><input type="checkbox" name="seleccionados" value="{{ item.uuid }}"></td>
+                    <td>{{ item.title }}</td>
+                    <td><a href="/ver_json?uuid={{ item.uuid }}" target="_blank" class="json-link">📄 Ver Detalles</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 1.5em; flex-wrap: wrap;">
+            <button type="submit" class="submit-btn">📊 Ver Metadatos</button>
+            <button type="submit" formaction="/exportar/json" class="export-btn export-json" onclick="event.stopPropagation()">💾 Exportar JSON</button>
+            <button type="submit" formaction="/exportar/excel" class="export-btn export-excel" onclick="event.stopPropagation()">📗 Exportar Excel</button>
+        </div>
+    </form>
+    {% endif %}
+    </div>
+</body>
+</html>

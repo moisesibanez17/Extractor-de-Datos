@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Metadatos Extraídos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 2em; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            margin-bottom: 1.5em;
+            text-align: center;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .bloque {
+            background: white;
+            padding: 2em;
+            margin-bottom: 1.5em;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .bloque:hover {
+            transform: translateY(-5px);
+        }
+        h2 { 
+            margin-top: 0;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5em;
+            margin-bottom: 1em;
+        }
+        ul { 
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        ul li:last-child {
+            border-bottom: none;
+        }
+        ul li strong {
+            color: #667eea;
+            display: inline-block;
+            min-width: 180px;
+        }
+        .link-button {
+            display: inline-block;
+            margin-top: 1em;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: transform 0.2s;
+        }
+        .link-button:hover {
+            transform: translateY(-2px);
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 2em;
+            padding: 12px 30px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.5em;
+            border-radius: 10px;
+            margin-bottom: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Metadatos Extraídos</h1>
+
+        {% if mensaje %}
+            <div class="warning-box">
+                <p><strong>⚠️ {{ mensaje }}</strong></p>
+            </div>
+        {% endif %}
+
+    {% if not metadatos %}
+        <p>No hay metadatos para mostrar. <a href="/">⬅ Volver al inicio</a></p>
+    {% else %}
+
+    {% for doc in metadatos %}
+        <div class="bloque">
+            <h2>📄 Documento</h2>
+            <p style="color: #666; font-size: 0.9em; margin-bottom: 1em;">UUID: <code>{{ doc["UUID"] }}</code></p>
+
+            <ul>
+                {% for clave, valores in doc.items() if clave != "UUID" %}
+                    <li><strong>{{ clave }}:</strong> {{ valores | join(', ') }}</li>
+                {% endfor %}
+            </ul>
+
+            <a href="/ver_json?uuid={{ doc['UUID'] }}" target="_blank" class="link-button">🔍 Ver Detalles Completos</a>
+        </div>
+    {% endfor %}
+
+    {% endif %}
+
+        <center><a href="/" class="back-button">⬅ Volver al inicio</a></center>
+    </div>
+</body>
+</html>

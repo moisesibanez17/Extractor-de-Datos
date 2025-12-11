@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles del Documento</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2em;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2em;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 0.5em;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .tab {
+            flex: 1;
+            padding: 1.2em;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .tab:hover {
+            background: #e9ecef;
+        }
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        .tab-content {
+            display: none;
+            padding: 2em;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .metadata-grid {
+            display: grid;
+            gap: 1em;
+        }
+        .metadata-item {
+            padding: 1em;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .metadata-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 0.5em;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .metadata-item .value {
+            color: #333;
+            line-height: 1.6;
+        }
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 1.5em;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .json-key { color: #e06c75; }
+        .json-string { color: #98c379; }
+        .json-number { color: #d19a66; }
+        .json-boolean { color: #56b6c2; }
+        .json-null { color: #c678dd; }
+        .back-button {
+            display: inline-block;
+            margin: 2em;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+        }
+        .api-link {
+            background: #e3f2fd;
+            padding: 1em;
+            border-radius: 8px;
+            margin-bottom: 1em;
+            border-left: 4px solid #2196f3;
+        }
+        .api-link a {
+            color: #2196f3;
+            text-decoration: none;
+            word-break: break-all;
+            font-family: monospace;
+        }
+        .api-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 Detalles del Documento</h1>
+            <p>UUID: {{ json_data.uuid }}</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="openTab('metadata')">📊 Metadatos</button>
+            <button class="tab" onclick="openTab('json')">💾 JSON Completo</button>
+        </div>
+
+        <div id="metadata" class="tab-content active">
+            <div class="api-link">
+                <strong>🔗 URL de la API:</strong><br>
+                <a href="{{ api_url }}" target="_blank">{{ api_url }}</a>
+            </div>
+
+            <div class="metadata-grid">
+                {% if metadata_traducido %}
+                    {% for key, values in metadata_traducido.items() %}
+                    <div class="metadata-item">
+                        <strong>{{ key }}</strong>
+                        <div class="value">
+                            {% if values is iterable and values is not string %}
+                                {% for item in values %}
+                                    {% if item.value %}
+                                        • {{ item.value }}<br>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {{ values }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No hay metadatos disponibles</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="json" class="tab-content">
+            <div class="api-link">
+                <strong>🔗 URL de la API:</strong><br>
+                <a href="{{ api_url }}" target="_blank">{{ api_url }}</a>
+            </div>
+            <pre>{{ json_data | tojson(indent=2) }}</pre>
+        </div>
+
+        <center><a href="/" class="back-button">⬅ Volver al inicio</a></center>
+    </div>
+
+    <script>
+        function openTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+    </script>
+</body>
+</html>
